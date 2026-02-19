@@ -1,11 +1,11 @@
-const accountModel=require("../models/account.model.js")
+const accountModel=require("../models/account.models.js")
 
 
 async function createAccountController(req,res){
     const user=req.user;
 
     const account=await accountModel.create({
-        user:user._id;
+        user:user._id
     })
     res.status(201).json({
         message:"Account Created Successfully",

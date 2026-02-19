@@ -1,9 +1,7 @@
 const userModel=require("../models/user.model.js")
 const jwt=require("jsonwebtoken")
 
-
-
-async function authMiddleware(req,res,next){
+async function authMiddleWare(req,res,next){
     const token=req.cookies.token || req.headers.authorization?.split(" ")[1]
     if(!token){
         return res.status(401).json({
