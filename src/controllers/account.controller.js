@@ -1,4 +1,4 @@
-const accountModel=require("../models/account.models.js")
+const accountModel=require("../models/account.model.js")
 
 
 async function createAccountController(req,res){
