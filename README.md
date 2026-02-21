@@ -2,10 +2,12 @@
 
 <div align="center">
   
-
+  [![Live Demo](https://img.shields.io/badge/Live%20Demo-Render.com-brightgreen?style=for-the-badge&logo=render)](https://ledgerflow-x3iq.onrender.com/)
+  [![API Status](https://img.shields.io/badge/API-Online-success?style=for-the-badge)](https://ledgerflow-x3iq.onrender.com/)
+  
   <h3>A production-ready banking API with ACID compliance, immutable ledger tracking, and enterprise-grade security</h3>
   
-  [Getting Started](#-quick-start) • [API Reference](#-api-reference) • [Features](#-core-features)
+  [Getting Started](#-quick-start) • [API Reference](#-api-reference) • [Live Demo](https://ledgerflow-x3iq.onrender.com/)
   
 </div>
 
@@ -20,6 +22,17 @@
 - [Examples](#-code-examples)
 - [Contributing](#-contributing)
 - [License](#-license)
+
+## 🌐 Live API
+
+The API is publicly accessible at: **https://ledgerflow-x3iq.onrender.com/**
+
+### API Base URL
+```
+https://ledgerflow-x3iq.onrender.com/api
+```
+
+> **Note**: This is a free Render.com instance, so it may take a few seconds to wake up if it's been inactive. First request might have a slight delay.
 
 ## ✨ Core Features
 
@@ -86,13 +99,16 @@
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Option 1: Use the Live API (No Setup Required)
+Simply use the base URL: `https://ledgerflow-x3iq.onrender.com/api`
 
+### Option 2: Run Locally
+
+#### Prerequisites
 - Node.js (v14 or higher)
 - MongoDB (v4.0+ for transactions)
 
-### Installation
-
+#### Installation
 ```bash
 # Clone the repository
 git clone https://github.com/Ishu6129/LedgerFlow.git
@@ -102,15 +118,6 @@ cd LedgerFlow
 npm install
 
 # Create .env file with required variables (see Environment Variables section)
-# This repository does not include a `.env.example`. Create a new `.env` file
-# in the project root with the variables shown in the "Environment Variables" section below.
-# Example `.env` contents:
-# MONGO_URI=mongodb://localhost:27017/ledgerflow
-# JWT_SECRET_KEY=your-super-secret-jwt-key
-# EMAIL_USER=your-email@gmail.com
-# CLIENT_ID=your-google-oauth-client-id
-# CLIENT_SECRET=your-google-oauth-client-secret
-# REFRESH_TOKEN=your-google-refresh-token
 
 # Start the server
 npm start
@@ -119,27 +126,27 @@ npm start
 # Visit http://localhost:3000 for API documentation
 ```
 
-### First API Calls
+### First API Calls (Using Live API)
 
 ```bash
 # 1. Register a user
-curl -X POST http://localhost:3000/api/auth/register \
+curl -X POST https://ledgerflow-x3iq.onrender.com/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"name":"John Doe","email":"john@example.com","password":"secure123"}'
 
 # 2. Login to get JWT token
-curl -X POST http://localhost:3000/api/auth/login \
+curl -X POST https://ledgerflow-x3iq.onrender.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"john@example.com","password":"secure123"}'
 # Save the token from response
 
 # 3. Create an account (use token from login)
-curl -X POST http://localhost:3000/api/accounts \
+curl -X POST https://ledgerflow-x3iq.onrender.com/api/accounts \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json"
 
 # 4. Check balance
-curl -X GET http://localhost:3000/api/accounts/balance \
+curl -X GET https://ledgerflow-x3iq.onrender.com/api/accounts/balance \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -237,7 +244,6 @@ Authorization: Bearer <your_jwt_token>
 | **Isolation** | Session isolation, 7-second delay | Concurrent ops don't interfere |
 | **Durability** | Write-after-commit, replica sets | Data persists forever |
 
-
 ## 🛠️ Tech Stack
 
 | Category | Technology |
@@ -248,6 +254,7 @@ Authorization: Bearer <your_jwt_token>
 | **Email** | Nodemailer + OAuth2 Gmail |
 | **Transactions** | MongoDB Sessions |
 | **Security** | Token Blacklist + TTL |
+| **Deployment** | Render.com + MongoDB Atlas |
 
 ## 🔧 Environment Variables
 
@@ -273,14 +280,16 @@ REFRESH_TOKEN=your-google-refresh-token
 
 ## 📝 Code Examples
 
-### Node.js
+### Node.js (Using Live API)
 
 ```javascript
 const axios = require('axios');
 
+const API_BASE_URL = 'https://ledgerflow-x3iq.onrender.com/api';
+
 async function example() {
   // Register
-  const register = await axios.post('http://localhost:3000/api/auth/register', {
+  const register = await axios.post(`${API_BASE_URL}/auth/register`, {
     name: 'Jane Smith',
     email: 'jane@example.com',
     password: 'SecurePass123!'
@@ -289,7 +298,7 @@ async function example() {
   const token = register.data.token;
   
   // Transfer money
-  const transfer = await axios.post('http://localhost:3000/api/transactions', 
+  const transfer = await axios.post(`${API_BASE_URL}/transactions`, 
     {
       fromUserAccount: 'acc_123456',
       toUserAccount: 'acc_789012',
@@ -300,6 +309,7 @@ async function example() {
   );
 }
 ```
+
 ## 📊 Database Schema
 
 ### Users Collection
@@ -370,7 +380,21 @@ async function example() {
 npm test
 ```
 
+## 🚢 Deployment Information
+
+This API is deployed on **Render.com** (free tier) with the following configuration:
+
+- **Platform**: Node.js
+- **Database**: MongoDB Atlas (cloud)
+- **Auto-deploy**: Enabled on push to main branch
+- **Region**: Automatic (closest to users)
+
+### Note for Users
+- The free tier spins down after 15 minutes of inactivity
+- First request after inactivity may take 20-30 seconds to respond
+- Subsequent requests will be fast
+
 
 <div align="center">
-  <a href="#-table-of-contents">Back to Top</a>
+  Made with ❤️ by Ishu6129
 </div>
