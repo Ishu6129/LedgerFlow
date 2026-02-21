@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LedgerFlow · Bank API Documentation</title>
+    <style>
+        /* ===== RESET & VARIABLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0a2540;
+            --primary-light: #1a3a5f;
+            --accent: #00b4d8;
+            --accent-dark: #0096c7;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        /* ===== TYPOGRAPHY ===== */
+        h1, h2, h3, h4 {
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.875rem;
+            color: var(--gray-900);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            color: var(--gray-800);
+        }
+
+        /* ===== NAVIGATION ===== */
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 1rem;
+            background: var(--gray-100);
+            border-radius: 100px;
+            font-size: 0.875rem;
+            color: var(--gray-700);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--gray-600);
+            text-decoration: none;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            transition: color 0.2s;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            border-bottom-color: var(--accent);
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            max-width: 1280px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 3rem 0;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--gray-600);
+            max-width: 600px;
+            margin: 1rem auto 2rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray-600);
+            font-size: 0.9375rem;
+        }
+
+        .stat-icon {
+            width: 20px;
+            height: 20px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        /* ===== SECTION STYLES ===== */
+        .section {
+            margin: 4rem 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(5deg, var(--primary), var(--accent));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin: 0;
+        }
+
+        .section-description {
+            color: var(--gray-600);
+            max-width: 800px;
+            margin-bottom: 2rem;
+        }
+
+        /* ===== GRID SYSTEMS ===== */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--gray-100);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .card-list {
+            list-style: none;
+        }
+
+        .card-list li {
+            margin-bottom: 0.5rem;
+            color: var(--gray-600);
+            font-size: 0.9375rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .card-list li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        /* ===== FEATURE CARDS (SPECIAL) ===== */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--gray-600);
+            font-size: 0.9375rem;
+        }
+
+        /* ===== ENDPOINT CARDS ===== */
+        .endpoint-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .endpoint-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.2s;
+        }
+
+        .endpoint-card:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-md);
+        }
+
+        .endpoint-method {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+
+        .method-post {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .method-get {
+            background: rgba(0, 180, 216, 0.1);
+            color: var(--accent-dark);
+        }
+
+        .endpoint-url {
+            font-family: var(--font-mono);
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .endpoint-desc {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .endpoint-badges {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .endpoint-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .badge-auth {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .badge-system {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        /* ===== ACID COMPLIANCE CARDS ===== */
+        .acid-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .acid-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s;
+        }
+
+        .acid-card:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .acid-letter {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .acid-name {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 1rem;
+        }
+
+        .acid-list {
+            list-style: none;
+        }
+
+        .acid-list li {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .acid-list li:before {
+            content: "•";
+            color: var(--accent);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        /* ===== TECH CARDS ===== */
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .tech-category {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--gray-200);
+        }
+
+        .tech-category h4 {
+            margin-bottom: 1.25rem;
+            color: var(--gray-900);
+        }
+
+        .tech-items {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .tech-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .tech-item-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--gray-100);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+
+        .tech-item-content {
+            flex: 1;
+        }
+
+        .tech-item-title {
+            font-weight: 600;
+            color: var(--gray-900);
+            font-size: 0.9375rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .tech-item-desc {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert {
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            border: 1px solid;
+        }
+
+        .alert-info {
+            background: rgba(0, 180, 216, 0.05);
+            border-color: rgba(0, 180, 216, 0.2);
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.05);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-info .alert-title { color: var(--accent-dark); }
+        .alert-warning .alert-title { color: var(--warning); }
+
+        /* ===== CODE BLOCKS ===== */
+        .code-block {
+            background: var(--gray-900);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            color: white;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            line-height: 1.7;
+        }
+
+        .code-tag {
+            color: var(--accent);
+        }
+
+        /* ===== GUIDELINES GRID ===== */
+        .guidelines-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .guideline-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .guideline-item strong {
+            color: var(--gray-900);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .guideline-item p {
+            color: var(--gray-600);
+            font-size: 0.9375rem;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            margin-top: 4rem;
+            padding: 2rem 0;
+            border-top: 1px solid var(--gray-200);
+            text-align: center;
+            color: var(--gray-500);
+            font-size: 0.875rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .grid-3, .grid-4, .feature-grid, .acid-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4, .feature-grid, .acid-grid, .tech-stack, .guidelines-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .endpoint-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="#" class="logo">
+                    <div class="logo-icon">L</div>
+                    <span class="logo-text">LedgerFlow</span>
+                </a>
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span>System Operational</span>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#acid">ACID</a>
+                <a href="#concepts">Concepts</a>
+                <a href="#api">API Reference</a>
+                <a href="#guides">Guides</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>LedgerFlow</h1>
+            <p class="hero-subtitle">A production-ready banking API with ACID compliance, ledger tracking, and enterprise-grade security.</p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-icon">🔒</span>
+                    <span>ACID Compliant</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">⚡</span>
+                    <span>Idempotent Operations</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">📊</span>
+                    <span>Immutable Ledger</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Core Features Section -->
+        <section id="features" class="section">
+            <div class="section-header">
+                <div class="section-icon">⚡</div>
+                <h2 class="section-title">Core Features</h2>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3>Security</h3>
+                    <p>JWT authentication with token blacklist, bcrypt hashing, and dual middleware for role-based access control.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3>Accounts</h3>
+                    <p>Multi-account support with ACTIVE status tracking, balance calculation from immutable ledger entries.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💸</div>
+                    <h3>Transactions</h3>
+                    <p>Money transfers with idempotency keys, 7-second delay for concurrency, and email notifications.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Ledger</h3>
+                    <p>Immutable audit trail with DEBIT/CREDIT entries, pre-hooks preventing modifications after creation.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Data Integrity</h3>
+                    <p>ACID transactions, race condition prevention, unique constraints on idempotency keys.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📧</div>
+                    <h3>Notifications</h3>
+                    <p>OAuth2 Gmail integration for registration emails and real-time transaction alerts.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACID Compliance Section -->
+        <section id="acid" class="section">
+            <div class="section-header">
+                <div class="section-icon">🔬</div>
+                <h2 class="section-title">ACID Compliance</h2>
+            </div>
+            <p class="section-description">Full ACID compliance ensures financial transactions are reliable and secure under concurrent load. Implemented using MongoDB 4.0+ transactions.</p>
+            
+            <div class="acid-grid">
+                <div class="acid-card">
+                    <div class="acid-letter">A</div>
+                    <div class="acid-name">Atomicity</div>
+                    <ul class="acid-list">
+                        <li>MongoDB sessions with startTransaction/commitTransaction</li>
+                        <li>All-or-nothing operations</li>
+                        <li>Automatic rollback on failure</li>
+                        <li>Prevents partial transactions</li>
+                    </ul>
+                </div>
+                <div class="acid-card">
+                    <div class="acid-letter">C</div>
+                    <div class="acid-name">Consistency</div>
+                    <ul class="acid-list">
+                        <li>Unique idempotencyKey constraint</li>
+                        <li>Ledger immutability (no updates/deletes)</li>
+                        <li>Balance = Credits - Debits</li>
+                        <li>Schema validation & referential integrity</li>
+                    </ul>
+                </div>
+                <div class="acid-card">
+                    <div class="acid-letter">I</div>
+                    <div class="acid-name">Isolation</div>
+                    <ul class="acid-list">
+                        <li>Session-based transaction isolation</li>
+                        <li>Atomic idempotency checks</li>
+                        <li>7-second delay between DEBIT/CREDIT</li>
+                        <li>Prevents dirty reads</li>
+                    </ul>
+                </div>
+                <div class="acid-card">
+                    <div class="acid-letter">D</div>
+                    <div class="acid-name">Durability</div>
+                    <ul class="acid-list">
+                        <li>Write-after-commit persistence</li>
+                        <li>Write-once, read-many ledger</li>
+                        <li>Status tracking for recovery</li>
+                        <li>Replica set durability</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <div class="alert-title">
+                    <span>🎓</span>
+                    <span>Key Concepts Applied</span>
+                </div>
+                <ul class="acid-list" style="margin-left: 2rem;">
+                    <li><strong>Normalization:</strong> Separate collections for users, accounts, transactions, ledger, tokenBlacklist</li>
+                    <li><strong>Indexing:</strong> Compound indexes on (user, status) and TTL on blacklist (3-day expiry)</li>
+                    <li><strong>Pre-Hooks:</strong> Prevent ledger UPDATE/DELETE after creation</li>
+                    <li><strong>Aggregation:</strong> Balance calculation via ledger aggregation pipeline</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Technical Implementation -->
+        <section id="concepts" class="section">
+            <div class="section-header">
+                <div class="section-icon">⚙️</div>
+                <h2 class="section-title">Technical Implementation</h2>
+            </div>
+
+            <div class="tech-stack">
+                <div class="tech-category">
+                    <h4>Database & Data Modeling</h4>
+                    <div class="tech-items">
+                        <div class="tech-item">
+                            <div class="tech-item-icon">🗄️</div>
+                            <div class="tech-item-content">
+                                <div class="tech-item-title">MongoDB Transactions</div>
+                                <div class="tech-item-desc">ACID compliance with session-based transactions</div>
+                            </div>
+                        </div>
+                        <div class="tech-item">
+                            <div class="tech-item-icon">📋</div>
+                            <div class="tech-item-content">
+                                <div class="tech-item-title">Schema Design</div>
+                                <div class="tech-item-desc">Normalized collections with ObjectId references</div>
+                            </div>
+                        </div>
+                        <div class="tech-item">
+                            <div class="tech-item-icon">📇</div>
+                            <div class="tech-item-content">
+                                <div class="tech-item-title">Indexing Strategy</div>
+                                <div class="tech-item-desc">Compound indexes, TTL on blacklist (3 days)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-category">
+                    <h4>Concurrency Control</h4>
+                    <div class="tech-items">
+                        <div class="tech-item">
+                            <div class="tech-item-icon">🔒</div>
+                            <div class="tech-item-content">
+                                <div class="tech-item-title">Atomic Operations</div>
+                                <div class="tech-item-desc">Session-based transaction isolation</div>
+                            </div>
+                        </div>
+                        <div class="tech-item">
+                            <div class="tech-item-icon">⏱️</div>
+                            <div class="tech-item-content">
+                                <div class="tech-item-title">Idempotency Keys</div>
+                                <div class="tech-item-desc">UUID v4 prevents duplicate processing</div>
+                            </div>
+                        </div>
+                        <div class="tech-item">
+                            <div class="tech-item-icon">⏳</div>
+                            <div class="tech-item-content">
+                                <div class="tech-item-title">7-Second Delay</div>
+                                <div class="tech-item-desc">Between DEBIT/CREDIT for stability</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-category">
+                    <h4>Security</h4>
+                    <div class="tech-items">
+                        <div class="tech-item">
+                            <div class="tech-item-icon">🔑</div>
+                            <div class="tech-item-content">
+                                <div class="tech-item-title">JWT Authentication</div>
+                                <div class="tech-item-desc">Token-based with blacklist support</div>
+                            </div>
+                        </div>
+                        <div class="tech-item">
+                            <div class="tech-item-icon">🛡️</div>
+                            <div class="tech-item-content">
+                                <div class="tech-item-title">Dual Auth Middleware</div>
+                                <div class="tech-item-desc">User auth + system auth for admin</div>
+                            </div>
+                        </div>
+                        <div class="tech-item">
+                            <div class="tech-item-icon">🚫</div>
+                            <div class="tech-item-content">
+                                <div class="tech-item-title">Token Blacklist</div>
+                                <div class="tech-item-desc">3-day auto-expiry TTL index</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-category">
+                    <h4>Stack</h4>
+                    <div class="tech-items">
+                        <div class="tech-item">
+                            <div class="tech-item-icon">🖥️</div>
+                            <div class="tech-item-content">
+                                <div class="tech-item-title">Backend</div>
+                                <div class="tech-item-desc">Node.js + Express.js</div>
+                            </div>
+                        </div>
+                        <div class="tech-item">
+                            <div class="tech-item-icon">🗄️</div>
+                            <div class="tech-item-content">
+                                <div class="tech-item-title">Database</div>
+                                <div class="tech-item-desc">MongoDB + Mongoose ODM</div>
+                            </div>
+                        </div>
+                        <div class="tech-item">
+                            <div class="tech-item-icon">📧</div>
+                            <div class="tech-item-content">
+                                <div class="tech-item-title">Email</div>
+                                <div class="tech-item-desc">Nodemailer + OAuth2 Gmail</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Reference -->
+        <section id="api" class="section">
+            <div class="section-header">
+                <div class="section-icon">📚</div>
+                <h2 class="section-title">API Reference</h2>
+            </div>
+
+            <!-- Authentication -->
+            <h3 style="margin: 2rem 0 1rem;">Authentication</h3>
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <span class="endpoint-method method-post">POST</span>
+                    <div class="endpoint-url">/api/auth/register</div>
+                    <div class="endpoint-desc">Create new user account</div>
+                    <div class="endpoint-badges">
+                        <span class="endpoint-badge">name</span>
+                        <span class="endpoint-badge">email</span>
+                        <span class="endpoint-badge">password</span>
+                    </div>
+                </div>
+                <div class="endpoint-card">
+                    <span class="endpoint-method method-post">POST</span>
+                    <div class="endpoint-url">/api/auth/login</div>
+                    <div class="endpoint-desc">Login & get JWT token</div>
+                    <div class="endpoint-badges">
+                        <span class="endpoint-badge">email</span>
+                        <span class="endpoint-badge">password</span>
+                    </div>
+                </div>
+                <div class="endpoint-card">
+                    <span class="endpoint-method method-post">POST</span>
+                    <div class="endpoint-url">/api/auth/logout</div>
+                    <div class="endpoint-desc">Logout & blacklist token</div>
+                    <div class="endpoint-badges">
+                        <span class="endpoint-badge badge-auth">Auth</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accounts -->
+            <h3 style="margin: 2rem 0 1rem;">Account Management</h3>
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <span class="endpoint-method method-post">POST</span>
+                    <div class="endpoint-url">/api/accounts</div>
+                    <div class="endpoint-desc">Create bank account</div>
+                    <div class="endpoint-badges">
+                        <span class="endpoint-badge badge-auth">Auth</span>
+                    </div>
+                </div>
+                <div class="endpoint-card">
+                    <span class="endpoint-method method-get">GET</span>
+                    <div class="endpoint-url">/api/accounts</div>
+                    <div class="endpoint-desc">Get all accounts</div>
+                    <div class="endpoint-badges">
+                        <span class="endpoint-badge badge-auth">Auth</span>
+                    </div>
+                </div>
+                <div class="endpoint-card">
+                    <span class="endpoint-method method-get">GET</span>
+                    <div class="endpoint-url">/api/accounts/balance</div>
+                    <div class="endpoint-desc">Check balance</div>
+                    <div class="endpoint-badges">
+                        <span class="endpoint-badge badge-auth">Auth</span>
+                    </div>
+                </div>
+                <div class="endpoint-card">
+                    <span class="endpoint-method method-get">GET</span>
+                    <div class="endpoint-url">/api/accounts/history</div>
+                    <div class="endpoint-desc">Transaction history</div>
+                    <div class="endpoint-badges">
+                        <span class="endpoint-badge badge-auth">Auth</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions -->
+            <h3 style="margin: 2rem 0 1rem;">Transactions</h3>
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <span class="endpoint-method method-post">POST</span>
+                    <div class="endpoint-url">/api/transactions</div>
+                    <div class="endpoint-desc">Transfer money</div>
+                    <div class="endpoint-badges">
+                        <span class="endpoint-badge badge-auth">Auth</span>
+                        <span class="endpoint-badge">fromUserAccount</span>
+                        <span class="endpoint-badge">toUserAccount</span>
+                        <span class="endpoint-badge">amount</span>
+                        <span class="endpoint-badge">idempotencyKey</span>
+                    </div>
+                </div>
+                <div class="endpoint-card">
+                    <span class="endpoint-method method-post">POST</span>
+                    <div class="endpoint-url">/api/transactions/system/initial-fund</div>
+                    <div class="endpoint-desc">Admin funding</div>
+                    <div class="endpoint-badges">
+                        <span class="endpoint-badge badge-system">System</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Guidelines -->
+        <section id="guides" class="section">
+            <div class="section-header">
+                <div class="section-icon">📋</div>
+                <h2 class="section-title">Guidelines & Important Features</h2>
+            </div>
+
+            <div class="guidelines-grid">
+                <div class="guideline-item">
+                    <strong>🔐 Authentication</strong>
+                    <p>Include header <code style="background: var(--gray-100); padding: 0.2rem 0.4rem; border-radius: 4px;">Authorization: Bearer &lt;token&gt;</code></p>
+                </div>
+                <div class="guideline-item">
+                    <strong>🚫 Logout</strong>
+                    <p>POST /api/auth/logout adds token to blacklist with 3-day auto-expiry</p>
+                </div>
+                <div class="guideline-item">
+                    <strong>🆔 Idempotency</strong>
+                    <p>Use unique UUID v4 for each transaction to prevent duplicates</p>
+                </div>
+                <div class="guideline-item">
+                    <strong>⚖️ Balance</strong>
+                    <p>Total Credits - Total Debits (calculated from immutable ledger)</p>
+                </div>
+                <div class="guideline-item">
+                    <strong>⏱️ 7-Second Delay</strong>
+                    <p>Between DEBIT and CREDIT creation for concurrent request handling</p>
+                </div>
+                <div class="guideline-item">
+                    <strong>📧 Notifications</strong>
+                    <p>Both sender and receiver get email alerts for all transactions</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Start -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-icon">🚀</div>
+                <h2 class="section-title">Quick Start</h2>
+            </div>
+
+            <div class="code-block">
+                <pre>
+# 1. Register new user
+POST /api/auth/register
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "secure123"
+}
+
+# 2. Login to get token
+POST /api/auth/login
+{
+  "email": "john@example.com",
+  "password": "secure123"
+}
+
+# 3. Create account
+POST /api/accounts
+Authorization: Bearer &lt;token&gt;
+
+# 4. Check balance
+GET /api/accounts/balance
+Authorization: Bearer &lt;token&gt;
+
+# 5. Transfer money (use unique idempotencyKey)
+POST /api/transactions
+Authorization: Bearer &lt;token&gt;
+{
+  "fromUserAccount": "acc_123",
+  "toUserAccount": "acc_456",
+  "amount": 1000,
+  "idempotencyKey": "550e8400-e29b-41d4-a716-446655440000"
+}
+
+# 6. Logout (blacklist token)
+POST /api/auth/logout
+Authorization: Bearer &lt;token&gt;</pre>
+            </div>
+
+            <div class="alert alert-warning">
+                <div class="alert-title">
+                    <span>⚠️</span>
+                    <span>Important Notes</span>
+                </div>
+                <ul style="margin-left: 2rem;">
+                    <li>Same idempotencyKey returns cached transaction - no duplicates</li>
+                    <li>Only ACTIVE accounts can perform transactions</li>
+                    <li>System endpoints require special SYSTEM_USER authentication</li>
+                    <li>Balance endpoint retrieves user's first account by default</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>LedgerFlow · Bank API Documentation</p>
+            <p style="margin-top: 0.5rem;">Node.js + Express + MongoDB · ACID Compliant · Token Blacklist · Idempotent Transactions</p>
+            <p style="margin-top: 1rem; font-size: 0.8rem;">© 2024 LedgerFlow · Version 2.0.0</p>
+        </footer>
+    </div>
+</body>
+</html>

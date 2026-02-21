@@ -24,4 +24,5 @@ router.get("/balance",authMiddleWare.authMiddleWare,accountController.getAccount
  */
 router.get("/history",authMiddleWare.authMiddleWare,accountController.getAccountTransactionHistoryController)
 
+
 module.exports=router

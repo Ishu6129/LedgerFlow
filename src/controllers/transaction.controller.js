@@ -18,9 +18,25 @@ async function createTransaction(req,res){
         return res.status(404).json({message:"Account not found"})
     }
 
-    /* 2.Validate idempotency key*/
-    const isTransactionExists=await transactionModel.findOne({idempotencyKey:idempotencyKey})
+    /* 3.Check Account Status */
+    if(fromUserAccountExists.status!=="ACTIVE" || toUserAccountExists.status!=="ACTIVE"){
+        return res.status(400).json({message:"Both accounts must be active to make a transaction"})
+    }
+
+    /* 4. Derive sender balance from ledger */
+    const balance=await fromUserAccountExists.getBalance();
+    if(balance<amount){
+        return res.status(400).json({message:`Insufficient balance! Your current balance is ${balance} and you are trying to transfer ${fromUserAccountExists.currency} ${amount}`})
+    }
+
+    /* 5. Start Transaction Session */
+    let session=await mongoose.startSession();
+    session.startTransaction();
+
+    /* 6. Validate idempotency key (INSIDE session for atomic check) */
+    const isTransactionExists=await transactionModel.findOne({idempotencyKey:idempotencyKey}).session(session)
     if(isTransactionExists){
+        session.endSession();
         if(isTransactionExists.status==="COMPLETED"){
             return res.status(200).json({message:"Transaction already completed :)",transaction:isTransactionExists})
         }else if(isTransactionExists.status==="PENDING"){
@@ -33,20 +49,7 @@ async function createTransaction(req,res){
         }
     }
 
-    /* 3.Check Account Status */
-    if(fromUserAccountExists.status!=="ACTIVE" || toUserAccountExists.status!=="ACTIVE"){
-        return res.status(400).json({message:"Both accounts must be active to make a transaction"})
-    }
-
-    /* 4. Derive sender balance from ledger */
-    const balance=await fromUserAccountExists.getBalance();
-    if(balance<amount){
-        return res.status(400).json({message:`Insufficient balance! Your current balance is ${balance} and you are trying to transfer ${fromUserAccountExists.currency} ${amount}`})
-    }
-
-    /* 5. Create Transaction with PENDING status */
-    const session=await mongoose.startSession();
-    session.startTransaction();
+    /* 7. Create Transaction with PENDING status */
     const transaction=(await transactionModel.create([{
         from:fromUserAccountExists._id,
         to:toUserAccountExists._id,
@@ -55,7 +58,7 @@ async function createTransaction(req,res){
         idempotencyKey
     }],{session:session}))[0]
 
-    /* 6. Create DEBIT Ledger Entry */
+    /* 8. Create DEBIT Ledger Entry */
     const debitLedgerEntry=await ledgerModel.create([{
         account:fromUserAccountExists._id,
         type:"DEBIT",
@@ -63,7 +66,10 @@ async function createTransaction(req,res){
         transaction:transaction._id
     }],{session:session})
 
-    /* 7. Create credit Ledger Entry */
+    /* 9. Wait 7 seconds before creating CREDIT entry (concurrent request handling) */
+    await new Promise((resolve) => setTimeout(resolve, 7 * 1000));
+
+    /* 10. Create credit Ledger Entry */
     const creditLedgerEntry=await ledgerModel.create([{
         account:toUserAccountExists._id,
         type:"CREDIT",
@@ -71,15 +77,15 @@ async function createTransaction(req,res){
         transaction:transaction._id
     }],{session:session})
 
-    /* 8. Mark Transaction Status to COMPLETED */
+    /* 11. Mark Transaction Status to COMPLETED */
     transaction.status="COMPLETED";
     await transaction.save({session:session})
 
-    /* 9. Commit Transaction */
+    /* 12. Commit Transaction */
     await session.commitTransaction();
     session.endSession();
 
-    /* 10. Send Email Notification to both users */
+    /* 13. Send Email Notification to both users */
     // Send email to sender
     await emailService.sendTransactionEmail(req.user.email,req.user.name,amount,toUserAccountExists._id)
     
@@ -89,6 +95,10 @@ async function createTransaction(req,res){
 
     return res.status(201).json({message:"Transaction completed successfully",transaction:transaction})
     }catch(error){
+        if(session){
+            await session.abortTransaction();
+            session.endSession();
+        }
         return res.status(400).json({message:"Transaction is Pending due to some issue, please retry after sometime"})
     }
 }
@@ -113,10 +123,15 @@ async function createInitialFundsTransaction(req,res){
         return res.status(400).json({message:"System user account not found"})
     }
 
+    /* 2. Start Transaction Session */
+    let session=await mongoose.startSession();
+    session.startTransaction();
+
     try{
-    /* 2.Validate idempotency key*/
-    const isTransactionExists=await transactionModel.findOne({idempotencyKey:idempotencyKey})
+    /* 3. Validate idempotency key (INSIDE session for atomic check) */
+    const isTransactionExists=await transactionModel.findOne({idempotencyKey:idempotencyKey}).session(session)
     if(isTransactionExists){
+        session.endSession();
         if(isTransactionExists.status==="COMPLETED"){
             return res.status(200).json({message:"Transaction already processed",transaction:isTransactionExists})
         }else if(isTransactionExists.status==="PENDING"){
@@ -129,8 +144,7 @@ async function createInitialFundsTransaction(req,res){
         }
     }
 
-    const session=await mongoose.startSession();
-    session.startTransaction();
+    /* 4. Create Transaction with PENDING status */
     const transaction=new transactionModel({
         from:fromSystemAccount._id,
         to:toUserAccountExists._id,
@@ -161,6 +175,10 @@ async function createInitialFundsTransaction(req,res){
     await emailService.sendInitialFundEmail(toUserAccountExists.user,toUserAccountExists._id,amount)
     return res.status(201).json({message:"Initial funds transaction completed successfully",transaction:transaction})
     }catch(error){
+        if(session){
+            await session.abortTransaction();
+            session.endSession();
+        }
         return res.status(400).json({message:"Transaction processing failed due to some issue, please retry after sometime"})
     }
 }
