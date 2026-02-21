@@ -95,8 +95,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ledgerflow.git
-cd ledgerflow
+git clone https://github.com/Ishu6129/LedgerFlow.git
+cd LedgerFlow
 
 # Install dependencies
 npm install
