@@ -57,15 +57,15 @@ async function sendLoginNotificationEmail(userEmail,userName){
 async function sendTransactionEmail(userEmail, name, amount, toAccount) {
     const subject = 'Transaction Successful!';
     const text = `Hello ${name},\n\nYour transaction of $${amount} to account ${toAccount} was successful.\n\nBest regards,\nThe Backend Ledger Team`;
-    const html = `<p>Hello ${name},</p><p>Your transaction of $${amount} to account ${toAccount} was successful.</p><p>Best regards,<br>The Backend Ledger Team</p>`;
+    const html = `<p>Hello ${name},</p><p>Your transaction of INR ${amount} to account ${toAccount} was successful.</p><p>Best regards,<br>The Backend Ledger Team</p>`;
 
     await sendEmail(userEmail, subject, text, html);
 }
 
 async function sendTransactionReceivedEmail(userEmail, name, amount, fromName) {
     const subject = 'You Received a Transaction!';
-    const text = `Hello ${name},\n\nYou have received a transaction of $${amount} from ${fromName}.\n\nBest regards,\nThe Backend Ledger Team`;
-    const html = `<p>Hello ${name},</p><p>You have received a transaction of $${amount} from ${fromName}.</p><p>Best regards,<br>The Backend Ledger Team</p>`;
+    const text = `Hello ${name},\n\nYou have received a transaction of INR ${amount} from ${fromName}.\n\nBest regards,\nThe Backend Ledger Team`;
+    const html = `<p>Hello ${name},</p><p>You have received a transaction of INR ${amount} from ${fromName}.</p><p>Best regards,<br>The Backend Ledger Team</p>`;
     await sendEmail(userEmail, subject, text, html);
 }
 

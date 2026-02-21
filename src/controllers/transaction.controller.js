@@ -18,6 +18,10 @@ async function createTransaction(req,res){
         return res.status(404).json({message:"Account not found"})
     }
 
+    // Prevent transactions to the same account or between accounts owned by the same user
+    if(String(fromUserAccountExists._id) === String(toUserAccountExists._id)){
+        return res.status(400).json({message:"Cannot transfer to the same account"})
+    }
     /* 3.Check Account Status */
     if(fromUserAccountExists.status!=="ACTIVE" || toUserAccountExists.status!=="ACTIVE"){
         return res.status(400).json({message:"Both accounts must be active to make a transaction"})
@@ -106,7 +110,7 @@ async function createTransaction(req,res){
 async function createInitialFundsTransaction(req,res){
     const {toUserAccount,amount,idempotencyKey}=req.body;
     if(!toUserAccount || !amount || !idempotencyKey){
-        return res.status(400).json({message:"toAccount, amount and idempotencyKey are required"})
+        return res.status(400).json({message:"toUserAccount, amount and idempotencyKey are required"})
     }
     const toUserAccountExists=await accountModel.findOne({_id:toUserAccount})
     if(!toUserAccountExists){
@@ -172,7 +176,8 @@ async function createInitialFundsTransaction(req,res){
     await session.commitTransaction();
     session.endSession();
 
-    await emailService.sendInitialFundEmail(toUserAccountExists.user,toUserAccountExists._id,amount)
+    const receiverUser = await userModel.findById(toUserAccountExists.user)
+    await emailService.sendInitialFundEmail(receiverUser.email,receiverUser.name,amount)
     return res.status(201).json({message:"Initial funds transaction completed successfully",transaction:transaction})
     }catch(error){
         if(session){
