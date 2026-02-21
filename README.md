@@ -102,8 +102,15 @@ cd LedgerFlow
 npm install
 
 # Create .env file with required variables (see Environment Variables section)
-cp .env.example .env
-# Edit .env with your MongoDB URI and email credentials
+# This repository does not include a `.env.example`. Create a new `.env` file
+# in the project root with the variables shown in the "Environment Variables" section below.
+# Example `.env` contents:
+# MONGO_URI=mongodb://localhost:27017/ledgerflow
+# JWT_SECRET_KEY=your-super-secret-jwt-key
+# EMAIL_USER=your-email@gmail.com
+# CLIENT_ID=your-google-oauth-client-id
+# CLIENT_SECRET=your-google-oauth-client-secret
+# REFRESH_TOKEN=your-google-refresh-token
 
 # Start the server
 npm start
