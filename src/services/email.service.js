@@ -62,16 +62,24 @@ async function sendTransactionEmail(userEmail, name, amount, toAccount) {
     await sendEmail(userEmail, subject, text, html);
 }
 
-async function sendTransactionFailureEmail(userEmail, name, amount, toAccount) {
-    const subject = 'Transaction Failed';
-    const text = `Hello ${name},\n\nWe regret to inform you that your transaction of $${amount} to account ${toAccount} has failed. Please try again later.\n\nBest regards,\nThe Backend Ledger Team`;
-    const html = `<p>Hello ${name},</p><p>We regret to inform you that your transaction of $${amount} to account ${toAccount} has failed. Please try again later.</p><p>Best regards,<br>The Backend Ledger Team</p>`;
+async function sendTransactionReceivedEmail(userEmail, name, amount, fromName) {
+    const subject = 'You Received a Transaction!';
+    const text = `Hello ${name},\n\nYou have received a transaction of $${amount} from ${fromName}.\n\nBest regards,\nThe Backend Ledger Team`;
+    const html = `<p>Hello ${name},</p><p>You have received a transaction of $${amount} from ${fromName}.</p><p>Best regards,<br>The Backend Ledger Team</p>`;
+    await sendEmail(userEmail, subject, text, html);
+}
 
+async function sendInitialFundEmail(userEmail, name, amount) {
+    const subject = 'Initial Fund Added!';
+    const text = `Hello ${name},\n\nAn initial fund of $${amount} has been added to your account.\n\nBest regards,\nThe Backend Ledger Team`;
+    const html = `<p>Hello ${name},</p><p>An initial fund of $${amount} has been added to your account.</p><p>Best regards,<br>The Backend Ledger Team</p>`;
     await sendEmail(userEmail, subject, text, html);
 }
 
 module.exports = {
     sendRegistrationEmail,
+    sendLoginNotificationEmail,
     sendTransactionEmail,
-    sendTransactionFailureEmail
+    sendTransactionReceivedEmail,
+    sendInitialFundEmail
 };

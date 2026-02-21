@@ -11,8 +11,10 @@ app.use(express.json())
 */
 const authRouter=require("./routes/auth.route.js")
 const accountRouter=require("./routes/account.route.js")
+const transactionRouter=require("./routes/transaction.route.js")
 
 app.use("/api/auth",authRouter)
 app.use("/api/accounts",accountRouter)
+app.use("/api/transactions",transactionRouter)
 
 module.exports=app;

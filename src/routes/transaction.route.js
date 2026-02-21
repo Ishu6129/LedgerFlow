@@ -4,6 +4,15 @@ const transactionController=require("../controllers/transaction.controller.js")
 
 const router=express.Router();
 
+
+/**
+ * - POST /api/transactions
+ */
 router.post("/",authMiddleWare.authMiddleWare,transactionController.createTransaction)
 
-module.exports=router 
+/**
+ * - POST /api/transactions/system/initial-fund
+ */
+router.post("/system/initial-fund",authMiddleWare.authSystemUserMiddleware,transactionController.createInitialFundsTransaction)
+
+module.exports=router

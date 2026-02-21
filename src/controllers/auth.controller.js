@@ -3,9 +3,10 @@ const jwt=require("jsonwebtoken")
 const emailService=require("../services/email.service.js")
 /**
  * - User register controller
- * - POST /api/auth/rtegister
+ * - POST /api/auth/register
  */
 async function userRegisterController(req,res){
+    try{
     const {email,password,name}=req.body
     const isExist=await userModel.findOne({email})
     if(isExist){
@@ -26,6 +27,13 @@ async function userRegisterController(req,res){
         token:token
     })
     await emailService.sendRegistrationEmail(user.email,user.name)
+    }catch(err){
+        res.status(500).json({
+            message:"Error during registration",
+            status:"failed",
+            error:err.message
+        })
+    }
 }
 
 /**
@@ -33,6 +41,7 @@ async function userRegisterController(req,res){
  * - POST /api/auth/login
  */
 async function userLoginController(req,res){
+    try{
     const {email,password}=req.body;
     const user=await userModel.findOne({email}).select("+password")
     if(!user){
@@ -59,6 +68,13 @@ async function userLoginController(req,res){
         token:token
     })
     await emailService.sendLoginNotificationEmail(user.email,user.name)
+    }catch(err){
+        res.status(500).json({
+            message:"Error during login",
+            status:"failed",
+            error:err.message
+        })
+    }
 }
 
 module.exports={

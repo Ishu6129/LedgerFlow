@@ -4,7 +4,7 @@ const ledgerModel=require("./ledger.model.js")
 const accountSchema=new mongoose.Schema({
     user:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'User',
+        ref:'user',
         required:[true,"Account must belong to a user"],
         index:true
     },
@@ -25,7 +25,7 @@ const accountSchema=new mongoose.Schema({
 
 accountSchema.index({user:1,status:1})
 
-accountschema.methods.getBalance=async function(){
+accountSchema.methods.getBalance=async function(){
     const findBalance=await ledgerModel.aggregate([
         {$match:{account:this._id}},
         {$group:{
@@ -43,6 +43,11 @@ accountschema.methods.getBalance=async function(){
     }else{
         return 0;
     }
+}
+
+accountSchema.methods.getTransactionHistory=async function(){
+    const transactions=await ledgerModel.find({account:this._id}).sort({createdAt:-1})
+    return transactions;
 }
 
 
