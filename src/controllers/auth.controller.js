@@ -1,7 +1,7 @@
 const userModel=require("../models/user.model.js")
 const jwt=require("jsonwebtoken")
 const emailService=require("../services/email.service.js")
-const tokenBlacklistModel=require("../models/blacklist.model.js")
+const tokenBlacklistModel=require("../models/blackList.model.js")
 
 /**
  * - User register controller
