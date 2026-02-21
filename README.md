@@ -2,14 +2,10 @@
 
 <div align="center">
   
-  ![Status](https://img.shields.io/badge/status-operational-success?style=for-the-badge)
-  ![Version](https://img.shields.io/badge/version-2.0.0-blue?style=for-the-badge)
-  ![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
-  [![Docs](https://img.shields.io/badge/docs-github_pages-purple?style=for-the-badge)](https://yourusername.github.io/ledgerflow)
-  
+
   <h3>A production-ready banking API with ACID compliance, immutable ledger tracking, and enterprise-grade security</h3>
   
-  [Getting Started](#-quick-start) • [API Reference](#-api-reference) • [Features](#-core-features) • [Documentation](https://yourusername.github.io/ledgerflow)
+  [Getting Started](#-quick-start) • [API Reference](#-api-reference) • [Features](#-core-features)
   
 </div>
 
